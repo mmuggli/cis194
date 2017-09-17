@@ -37,3 +37,24 @@ module LogAnalysis where
     inOrder :: MessageTree -> [LogMessage]
     inOrder Leaf = []
     inOrder (Node lb l rb) = (inOrder lb) ++ [l] ++ (inOrder rb)
+
+    matters :: LogMessage -> Bool
+    matters (LogMessage (Error s) _ _) 
+        | s > 50 = True
+        | otherwise = False
+                    
+    matters _ = False
+
+    getstring :: LogMessage -> String
+    getstring (LogMessage _ t m) = (show t) ++ m
+                   --getstring _ = undefined
+                                 
+    whatWentWrongHelper :: [LogMessage] -> [String]
+    whatWentWrongHelper [] = []
+    whatWentWrongHelper (m:ms) = if matters m
+                           then (getstring m) : whatWentWrong ms
+                           else whatWentWrong ms
+
+    whatWentWrong :: [LogMessage] -> [String]
+    whatWentWrong ms = whatWentWrongHelper $ inOrder $ build  ms
+
