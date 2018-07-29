@@ -16,11 +16,11 @@ fun2piecemeal 1 = 0
 fun2piecemeal n | even n = n + fun2piecemeal (n `div` 2)
                 | otherwise = fun2piecemeal (3 * n + 1)
 
-fun2rec :: Integer -> Integer              
-fun2rec n | even n = n `div` 2
+fun2iter :: Integer -> Integer              
+fun2iter n | even n = n `div` 2
           | otherwise = 3 * n + 1
 
 
                         
 fun2 :: Integer -> Integer
-fun2 n = sum $ filter even $ takeWhile (\i -> i > 1) $ iterate fun2rec n
+fun2 n = sum $ filter even $ takeWhile (\i -> i > 1) $ iterate fun2iter n
