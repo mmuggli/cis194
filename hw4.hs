@@ -23,4 +23,4 @@ fun2rec n | even n = n `div` 2
 
                         
 fun2 :: Integer -> Integer
-fun2 n = sum $ fmap (\i -> if (even i) then i else 0) $ takeWhile (\i -> i > 1) $ iterate fun2rec n
+fun2 n = sum $ filter even $ takeWhile (\i -> i > 1) $ iterate fun2rec n
