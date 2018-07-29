@@ -46,7 +46,7 @@ string_of_count :: Int -> Int -> String
 string_of_count j i = take (fromIntegral i)  (repeat '*') ++ take (fromIntegral (j - i)) (repeat ' ')
 
 histogram :: [Integer] -> String
-histogram l = let g = fmap (\c -> (length c) -1) $ group $ sort $ l ++ [0..9]
+histogram l = let g = fmap (\c -> (subtract 1) (length c) ) $ group $ sort $ l ++ [0..9]
                   m = foldl max 0 g
                   mainhist = reverse $ transpose $ fmap (string_of_count m) g
                   barline = (take 10 (repeat '=')) :: String
