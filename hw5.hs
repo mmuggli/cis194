@@ -60,7 +60,7 @@ testSat = testExp :: Maybe Mod7
 --compile :: String -> Maybe Program
            
 -- Simply create an instance of the Expr type class for Program
-instance Expr Program where
-    lit a = [PushI a]
-    add a b = a ++ b ++ [Add]
-    mul a b = a ++ b ++ [Mul]
+-- instance Expr Program where
+--     lit a = [PushI a]
+--     add a b = a ++ b ++ [Add]
+--     mul a b = a ++ b ++ [Mul]
