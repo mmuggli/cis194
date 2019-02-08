@@ -1,5 +1,6 @@
 import Sized
-
+import Scrabble
+    
 data JoinList m a = Empty
                   | Single m a
                   | Append m (JoinList m a) (JoinList m a)
@@ -56,3 +57,7 @@ takeJ i (Append m jl1 jl2) = let jl1size = (getSize (size (tag jl1))) in
                              then takeJ i jl1
                              else (+++) jl1 (takeJ (i - jl1size) jl2)
                                   
+
+scoreLine :: String -> JoinList Score String
+scoreLine s = Single (scoreString s) s
+              

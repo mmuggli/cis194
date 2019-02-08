@@ -30,6 +30,9 @@ score c = case scoremap Map.!? c of
             Just i -> Score i
             Nothing -> Score 0
          
+getScore :: Score -> Int
+getScore (Score i) = i
          
---scoreString :: String -> Score    
+scoreString :: String -> Score
+scoreString s = Score $ foldl (+) 0 $ fmap (getScore . score) s
 
