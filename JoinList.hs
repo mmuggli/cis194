@@ -37,4 +37,11 @@ indexJ i (Append m jl1 jl2) | i <= (getSize (size m)) = if i < (getSize (size (t
 indexJ _ _ = Nothing    
 
 
---dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a             
+dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
+dropJ 0 j = j
+dropJ i jl | i >= getSize (size (tag jl)) = Empty
+-- now we can assume that it must be an Append
+dropJ i (Append m jl1 jl2) = let jl1size = (getSize (size (tag jl1))) in
+                             if i < jl1size
+                             then (+++) (dropJ i jl1) jl2
+                             else dropJ (i - jl1size) jl2
