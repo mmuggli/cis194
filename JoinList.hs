@@ -3,6 +3,9 @@
 import Sized
 import Scrabble
 import Buffer
+import StringBuffer
+import Editor
+
     
 data JoinList m a = Empty
                   | Single m a
@@ -65,7 +68,8 @@ scoreLine :: String -> JoinList Score String
 scoreLine s = Single (scoreString s) s
               
 
-
+-- FIXME: Is there a better way to to toString, numLines and value
+-- that doesn't require spelling out all the varried constructors?
 
 instance Buffer (JoinList (Score, Size) String) where
     toString Empty = ""
@@ -87,3 +91,15 @@ instance Buffer (JoinList (Score, Size) String) where
     value Empty = 0
     value (Single (sc, sz) _) = getScore sc
     value (Append (sc, sz) _ _) = getScore sc
+
+listToJL :: [String] -> JoinList (Score, Size) String
+listToJL s = foldl (+++) Empty $ fmap (\t -> Single (scoreString t, Size 1) t) s
+
+defaultbuf =          [ "This buffer is for notes you don't want to save, and for"
+         , "evaluation of steam valve coefficients."
+         , "To load a different file, type the character L followed"
+         , "by the name of the file."
+         ]
+             
+             
+main = runEditor editor $ listToJL defaultbuf
