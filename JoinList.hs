@@ -1,5 +1,8 @@
+{-# LANGUAGE FlexibleInstances, TypeSynonymInstances #-}
+
 import Sized
 import Scrabble
+import Buffer
     
 data JoinList m a = Empty
                   | Single m a
@@ -61,3 +64,26 @@ takeJ i (Append m jl1 jl2) = let jl1size = (getSize (size (tag jl1))) in
 scoreLine :: String -> JoinList Score String
 scoreLine s = Single (scoreString s) s
               
+
+
+
+instance Buffer (JoinList (Score, Size) String) where
+    toString Empty = ""
+    toString (Single _ b) = b
+    toString (Append _ a b) = toString a ++ toString b
+    fromString s = Single (scoreString s, Size 1) s
+    line i b = indexJ i b
+    replaceLine i s b = let prefix = takeJ (i - 1) b
+                            suffix = dropJ (i + 1) b
+                            replacement = Single (scoreString s, Size 1) s in
+                        prefix +++ replacement +++ suffix
+    -- numLines b = case tag b of
+    --                 (_, Just i) -> getSize $ size i
+    --                 otherwise -> 0
+    numLines Empty = 0
+    numLines (Single (sc, sz) _) = getSize sz
+    numLines (Append (sc, sz) _ _) = getSize sz
+                                 
+    value Empty = 0
+    value (Single (sc, sz) _) = getScore sc
+    value (Append (sc, sz) _ _) = getScore sc

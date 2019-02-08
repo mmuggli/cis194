@@ -8,7 +8,7 @@ newtype Size = Size Int
 
 getSize :: Size -> Int
 getSize (Size i) = i
-
+ 
 class Sized a where
   size :: a -> Size
 
