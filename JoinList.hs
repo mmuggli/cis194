@@ -41,7 +41,18 @@ dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
 dropJ 0 j = j
 dropJ i jl | i >= getSize (size (tag jl)) = Empty
 -- now we can assume that it must be an Append
+-- because it's greater than 0 and less than the size
+-- (assuming the metadata/cache is consistent)
 dropJ i (Append m jl1 jl2) = let jl1size = (getSize (size (tag jl1))) in
                              if i < jl1size
                              then (+++) (dropJ i jl1) jl2
                              else dropJ (i - jl1size) jl2
+
+takeJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
+takeJ 0 j = Empty
+takeJ i jl | i >= getSize (size (tag jl)) = jl
+takeJ i (Append m jl1 jl2) = let jl1size = (getSize (size (tag jl1))) in
+                             if i <= jl1size
+                             then takeJ i jl1
+                             else (+++) jl1 (takeJ (i - jl1size) jl2)
+                                  
