@@ -35,6 +35,7 @@ nats :: Stream Integer
 nats = streamFromSeed (1+) 0
 
 interleaveStreams :: Stream a -> Stream a -> Stream a
+-- this version made ruler hang. maybe play with lazy patterns here?                     
 -- interleaveStreams (Cons a s) (Cons b t) = Cons a (Cons b (interleaveStreams s t))
 interleaveStreams (Cons a s) t = Cons a (interleaveStreams t s)
                                  
