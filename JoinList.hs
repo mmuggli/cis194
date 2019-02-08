@@ -71,13 +71,18 @@ scoreLine s = Single (scoreString s) s
 -- FIXME: Is there a better way to to toString, numLines and value
 -- that doesn't require spelling out all the varried constructors?
 
+listToJL :: [String] -> JoinList (Score, Size) String
+listToJL s = foldl (+++) Empty $ fmap (\t -> Single (scoreString t, Size 1) t) s
+
+
 instance Buffer (JoinList (Score, Size) String) where
     toString Empty = ""
     toString (Single _ b) = b
     toString (Append _ a b) = toString a ++ toString b
-    fromString s = Single (scoreString s, Size 1) s
+--    fromString s = Single (scoreString s, Size 1) s
+    fromString s = listToJL $ lines s
     line i b = indexJ i b
-    replaceLine i s b = let prefix = takeJ (i - 1) b
+    replaceLine i s b = let prefix = takeJ (i ) b
                             suffix = dropJ (i + 1) b
                             replacement = Single (scoreString s, Size 1) s in
                         prefix +++ replacement +++ suffix
@@ -91,9 +96,6 @@ instance Buffer (JoinList (Score, Size) String) where
     value Empty = 0
     value (Single (sc, sz) _) = getScore sc
     value (Append (sc, sz) _ _) = getScore sc
-
-listToJL :: [String] -> JoinList (Score, Size) String
-listToJL s = foldl (+++) Empty $ fmap (\t -> Single (scoreString t, Size 1) t) s
 
 defaultbuf =          [ "This buffer is for notes you don't want to save, and for"
          , "evaluation of steam valve coefficients."
