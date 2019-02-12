@@ -41,3 +41,9 @@ nextLevel e@(Emp {empFun = f}) gl = let with = glCons e $ mconcat $  map snd gl
 maxFun :: Tree Employee -> GuestList
 maxFun t =  case treeFold nextLevel  t of
              (gl1, gl2) -> moreFun gl1 gl2
+
+main :: IO ()
+main = do
+  f <- readFile "company.txt"
+  let t = read f
+  putStrLn $ show $ maxFun t
