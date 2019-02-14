@@ -106,3 +106,5 @@ instance Alternative Parser where
 intOrUppercase :: Parser ()
 intOrUppercase = (\x -> ()) <$> (posInt) <|> (\y -> ()) <$> (satisfy isUpper)
 
+
+
