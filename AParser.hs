@@ -21,6 +21,7 @@ newtype Parser a = Parser { runParser :: String -> Maybe (a, String) }
 satisfy :: (Char -> Bool) -> Parser Char
 satisfy p = Parser f
   where
+    f :: String -> Maybe (Char, String)
     f [] = Nothing    -- fail on the empty input
     f (x:xs)          -- check if x satisfies the predicate
                         -- if so, return x along with the remainder
@@ -57,3 +58,51 @@ posInt = Parser f
 ------------------------------------------------------------
 -- Your code goes below here
 ------------------------------------------------------------
+first :: (a -> b) -> (a,c) -> (b,c)
+first f (a,c) = (f a,c)
+
+instance Functor Parser where
+    fmap f fa = Parser g
+         --g :: String -> Maybe (b, String) TODO: figure out why compile fails
+        where g a = case (runParser fa) a of
+                      Nothing -> Nothing
+                      Just (c, s) -> Just (f c, s)
+--                                  :: Functor f => (a -> b) -> f a -> f b
+
+instance Applicative Parser where
+    pure x = Parser g
+        where g s = Just (x, s)
+                    
+    (<*>) p1 p2 = Parser the_parser
+        where the_parser s = case (runParser p1) s of
+                      Nothing -> Nothing
+                      Just (a_func, rem_s) -> case (runParser p2) rem_s of
+                                        Nothing -> Nothing
+                                        Just (some_val, s3) -> Just (a_func some_val, s3)
+
+
+abParser :: Parser (Char, Char)
+abParser = (,) <$> char 'a' <*> char 'b'
+           
+-- this works but seems odd to make a lambda function, like the assignment
+-- wants us to use some other function we are already supposed to know about
+-- maybe pure?
+abParser_ :: Parser ()
+abParser_ = (\x y -> ()) <$> char 'a' <*> char 'b'             
+
+intPair :: Parser [Integer]
+intPair = (\x y z -> [x,z]) <$> posInt <*> char ' ' <*> posInt
+
+instance Alternative Parser where
+    empty = Parser (\s -> Nothing)
+
+    (<|>) p1 p2 = Parser the_parser where
+        the_parser s = case (runParser p1) s of
+                         p1res@(Just (v, rem_s)) -> p1res
+                         Nothing -> case (runParser p2) s of
+                                      Nothing -> Nothing
+                                      p2res@(Just (v, rem_s)) -> p2res
+
+intOrUppercase :: Parser ()
+intOrUppercase = (\x -> ()) <$> (posInt) <|> (\y -> ()) <$> (satisfy isUpper)
+
