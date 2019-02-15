@@ -4,8 +4,9 @@
 
 module SExpr where
 
-import AParserB -- renamed since hw10 uses a different AParser
+import AParser -- renamed since hw10 uses a different AParser
 import Control.Applicative
+import Data.Char    
 
 ------------------------------------------------------------
 --  1. Parsing repetitions
@@ -22,10 +23,10 @@ oneOrMore p = (:) <$> p <*> zeroOrMore p -- undefined
 ------------------------------------------------------------
 
 spaces :: Parser String
-spaces = undefined
+spaces = zeroOrMore $ satisfy isSpace
 
 ident :: Parser String
-ident = undefined
+ident = (:) <$> (satisfy isAlpha) <*> (zeroOrMore $ satisfy isAlphaNum)
 
 ------------------------------------------------------------
 --  3. Parsing S-expressions
@@ -45,4 +46,24 @@ data SExpr = A Atom
            | Comb [SExpr]
   deriving Show
 
+parseInt :: Parser SExpr
+parseInt =  Parser f where
+    f s = case (runParser posInt) s of
+             Nothing -> Nothing
+             Just (i, s) -> Just (A (N i), s)
 
+parseIdent :: Parser SExpr
+parseIdent = Parser f where
+    f s = case (runParser ident) s of
+               Nothing -> Nothing
+               Just (i, s) -> Just (A (I i), s)               
+  
+parseAtom :: Parser SExpr
+parseAtom = parseInt <|> parseIdent
+
+parseComb :: Parser SExpr            
+parseComb = (char '(') *> (Comb <$> (zeroOrMore parseSExpr)) <* (char ')')
+            
+parseSExpr :: Parser SExpr
+--parseSExpr = spaces *> parseAtom  <* spaces
+parseSExpr = spaces *> (parseAtom <|> parseComb) <* spaces             
