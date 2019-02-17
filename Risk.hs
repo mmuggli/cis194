@@ -1,6 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
-module Risk where
+module Main where
 
 import Control.Monad.Random
 import Debug.Trace
@@ -53,8 +53,22 @@ battle Battlefield { attackers = a, defenders = d} =
                            (d - (length awin))) -- bogus
                                                                    
 
+invade :: Battlefield -> Rand StdGen Battlefield
+invade Battlefield { attackers = a, defenders = d} | d == 0 || a < 2 =  return $ Battlefield a d
+invade bf = (battle bf)  >>= invade
+
+
+runs = 1000
+       
+successProb :: Battlefield -> Rand StdGen Double
+successProb bf = do
+  resultants_bfs <- replicateM runs (invade bf)
+  let wins = filter (\Battlefield { attackers = a, defenders = d} -> d == 0) resultants_bfs
+  let res = (fromIntegral (length wins)) / (fromIntegral runs)
+
+  return res
                                                      
 main :: IO ()
-main = do bf <- evalRandIO (battle (Battlefield 3 3))
+main = do bf <- evalRandIO (successProb (Battlefield 3 3))
           putStrLn $ show $  bf
 
